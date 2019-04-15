@@ -74,8 +74,7 @@ public class IBeacon {
      */
     public static final int PROXIMITY_UNKNOWN = 0;
 
-    final private static char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    private static final String TAG = "IBeacon";
+    private static final char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     /**
      * A 16 byte UUID that typically represents the company owning a number of iBeacons
@@ -281,32 +280,18 @@ public class IBeacon {
                     ((int) scanData[startByte + 1] & 0xff) == 0x24 &&
                     ((int) scanData[startByte + 2] & 0xff) == 0xbf &&
                     ((int) scanData[startByte + 3] & 0xff) == 0x16) {
-                IBeacon iBeacon = new IBeacon();
-                iBeacon.major = 0;
-                iBeacon.minor = 0;
-                iBeacon.proximityUuid = "00000000-0000-0000-0000-000000000000";
-                iBeacon.txPower = -55;
-                iBeacon.bleDataPayload = getPayloadData(scanData);
-                iBeacon.timezoneString = getDateCurrentTimeZone();
-                return iBeacon;
+                return getNewBeacon(scanData);
             } else if (((int) scanData[startByte] & 0xff) == 0xad &&
                     ((int) scanData[startByte + 1] & 0xff) == 0x77 &&
                     ((int) scanData[startByte + 2] & 0xff) == 0x00 &&
                     ((int) scanData[startByte + 3] & 0xff) == 0xc6) {
-                IBeacon iBeacon = new IBeacon();
-                iBeacon.major = 0;
-                iBeacon.minor = 0;
-                iBeacon.proximityUuid = "00000000-0000-0000-0000-000000000000";
-                iBeacon.txPower = -55;
-                iBeacon.bleDataPayload = getPayloadData(scanData);
-                iBeacon.timezoneString = getDateCurrentTimeZone();
-                return iBeacon;
+                return getNewBeacon(scanData);
             }
             startByte++;
         }
 
 
-        if (patternFound == false) {
+        if (!patternFound) {
             // This is not an iBeacon
             return null;
         }
@@ -354,30 +339,39 @@ public class IBeacon {
         return iBeacon;
     }
 
+    private static IBeacon getNewBeacon(byte[] scanData) {
+        IBeacon iBeacon = new IBeacon();
+        iBeacon.major = 0;
+        iBeacon.minor = 0;
+        iBeacon.proximityUuid = "00000000-0000-0000-0000-000000000000";
+        iBeacon.txPower = -55;
+        iBeacon.bleDataPayload = getPayloadData(scanData);
+        iBeacon.timezoneString = getDateCurrentTimeZone();
+        return iBeacon;
+    }
+
     public String getBleDataPayload() {
         return bleDataPayload;
     }
 
     private static String getPayloadData(byte[] scanRecord) {
-
-        String dataPayload = "";
+        StringBuilder dataPayload = new StringBuilder();
         if (scanRecord.length > 0) {
             for (int i = 14; i < scanRecord.length; i++) {
                 try {
                     String data = new String(new byte[]{scanRecord[i]}, "UTF-8");
-                    dataPayload += data;
+                    dataPayload.append(data);
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    Log.e(IBeacon.class.getName(), e.getMessage(), e);
                 }
             }
         }
 
-        dataPayload = cleanTextContent(dataPayload);
-        return dataPayload.trim();
+        dataPayload = new StringBuilder(cleanTextContent(dataPayload.toString()));
+        return dataPayload.toString().trim();
     }
 
-    private static String cleanTextContent(String text)
-    {
+    private static String cleanTextContent(String text) {
         // strips off all non-ASCII characters
         text = text.replaceAll("[^\\x00-\\x7F]", "");
 
@@ -407,48 +401,13 @@ public class IBeacon {
 
     }
 
-    protected IBeacon(String proximityUuid, int major, int minor, int txPower, int rssi) {
-        this.proximityUuid = proximityUuid.toLowerCase();
-        this.major = major;
-        this.minor = minor;
-        this.rssi = rssi;
-        this.txPower = txPower;
-    }
-
-    public IBeacon(String proximityUuid, int major, int minor) {
-        this.proximityUuid = proximityUuid.toLowerCase();
-        this.major = major;
-        this.minor = minor;
-        this.rssi = rssi;
-        this.txPower = -59;
-        this.rssi = 0;
-    }
-
-//	protected static double calculateAccuracy(int txPower, double rssi) {
-//		if (rssi == 0) {
-//			return -1.0; // if we cannot determine accuracy, return -1.
-//		}
-//
-//		if (IBeaconManager.debug) Log.d(TAG, "calculating accuracy based on rssi of "+rssi);
-//
-//
-////		double ratio = rssi*1.0/txPower;
-//		double ratio= rssi/(-62.68);
-//		if (ratio < 1.0) {
-//			return Math.pow(ratio,10);
-//		}
-//		else {
-//			double accuracy =  (1.203420305)*Math.pow(ratio,6.170094565) + 0.7365906529;
-//			if (IBeaconManager.debug) Log.d(TAG, " avg rssi: "+rssi+" accuracy: "+accuracy);
-//			return accuracy;
-//		}
-//	}
 
     public static String getDateCurrentTimeZone() {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return sdf.format(new Date().getTime());
         } catch (Exception e) {
+            Log.e(IBeacon.class.getName(), e.getMessage(), e);
         }
         return "";
     }
@@ -461,22 +420,16 @@ public class IBeacon {
 
         Log.d("RSSI", "" + rssi);
         double ratio = rssi * 1.0 / txPower;
-//        if (Double.isInfinite(ratio)) {
-//            return -1.0;
-//        }
         if (ratio < 1.0) {
             return Math.pow(ratio, 10);
         } else {
-            double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
-            return accuracy;
+            return (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
         }
     }
 
     protected static int calculateProximity(double accuracy) {
         if (accuracy < 0) {
             return PROXIMITY_UNKNOWN;
-            // is this correct?  does proximity only show unknown when accuracy is negative?  I have seen cases where it returns unknown when
-            // accuracy is -1;
         }
         if (accuracy < 0.5) {
             return IBeacon.PROXIMITY_IMMEDIATE;

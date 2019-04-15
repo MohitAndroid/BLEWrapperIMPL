@@ -1,13 +1,11 @@
 package org.beaconwrapper.parse;
 
-import android.app.Activity;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
-import org.beaconwrapper.beacon.BeaconHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +13,7 @@ import org.json.JSONTokener;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +27,6 @@ public class ParserListClass<T> {
     private static final String JSON_OBJECT = "jsonObject";
     private static final String JSON_ARRAY = "jsonArray";
     private int count = 0;
-    private List<T> parableObjects;
     private String jsonString;
     private FilterListener<T> filterListener;
 
@@ -36,10 +34,10 @@ public class ParserListClass<T> {
         rootFields = new ArrayList<>();
         count = 0;
         gson = new Gson();
-        parableObjects = new ArrayList<>();
     }
+
     public static ParserListClass getParserListClass() {
-        return  new ParserListClass();
+        return new ParserListClass();
     }
 
     private void setFields() throws ParseFilterException {
@@ -106,7 +104,7 @@ public class ParserListClass<T> {
 
 
     private Map<String, Object> jsonToMap(JSONObject json) throws JSONException {
-        Map<String, Object> retMap = new HashMap<String, Object>();
+        Map<String, Object> retMap = new HashMap();
 
         if (json != JSONObject.NULL) {
             retMap = toMap(json);
@@ -124,7 +122,7 @@ public class ParserListClass<T> {
     }
 
     private Map<String, Object> toMap(JSONObject object) throws JSONException {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap();
 
         Iterator<String> keysItr = object.keys();
         while (keysItr.hasNext()) {
@@ -144,7 +142,7 @@ public class ParserListClass<T> {
     }
 
     private List<Object> toList(JSONArray array) throws JSONException {
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList();
         for (int i = 0; i < array.length(); i++) {
             Object value = array.get(i);
             if (value instanceof JSONArray) {
@@ -177,16 +175,13 @@ public class ParserListClass<T> {
                         for (int k = 0; k < rootFields.size(); k++) {
                             String fName = rootFields.get(k);
 
-//                            if (dataInfoEntity.getData().toLowerCase().indexOf(fName.toLowerCase()) > -1) {
                             if (Pattern.matches(fName, dataInfoEntity.getData())) {
                                 isRelativeData = true;
                                 break;
                             }
                         }
-                        if (isRelativeData) {
-                            if (!filterData.isEmpty()) {
-                                break;
-                            }
+                        if (isRelativeData && !filterData.isEmpty()) {
+                            break;
                         }
                     }
 
@@ -197,7 +192,7 @@ public class ParserListClass<T> {
 
 
                     while (keys.hasNext()) {
-                        String obj = (String) keys.next();
+                        String obj = keys.next();
                         if (rootFields.contains(obj)) {
                             isRelativeData = true;
                             break;
@@ -224,19 +219,14 @@ public class ParserListClass<T> {
     }
 
     private boolean isStringType() {
-        if (t.equals(String.class)) {
-            return true;
-        } else {
-            return false;
-        }
+        return t.equals(String.class);
     }
 
-    private  Gson gson;
+    private Gson gson;
 
     private T checkEntity(String response) {
         try {
-            T t = gson.fromJson(response, this.t);
-            return t;
+            return gson.fromJson(response, this.t);
         } catch (Exception e) {
             return null;
         }
@@ -245,11 +235,10 @@ public class ParserListClass<T> {
 
     private List<T> checkEntityList(String response) {
         try {
-            List t = gson.fromJson(response, new TypeToken<ArrayList<T>>() {
+            return gson.fromJson(response, new TypeToken<ArrayList<T>>() {
             }.getType());
-            return t;
         } catch (Exception e) {
-            return null;
+            return Collections.emptyList();
         }
 
     }

@@ -1,6 +1,5 @@
 package org.beaconwrapper;
 
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,13 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
 
     BeaconListener beaconListener = new BeaconListener() {
         @Override
         public void onResult(List<IBeacon> beaconResultEntities) {
             for (int i = 0; i < beaconResultEntities.size(); i++) {
-                Log.d("BLE-RESPONSE", "Beacon : " + beaconResultEntities.get(i).getBluetoothAddress());
+                Log.d("BLE-RESPONSE", "Beacon : " + beaconResultEntities.get(i).
+                        getBluetoothAddress());
             }
             Log.d("BLE-RESPONSE", "***********************************");
         }

@@ -23,6 +23,8 @@ public class BLEBeaconWrapper<T> {
 
     private Activity context;
     private List<BleAdapterEntity> leScanCallbacks;
+    private static final String LOG1 = "TTMMPP";
+    private static final String LOG2 = "BLE-RESPONSE";
 
     public BLEBeaconWrapper(Activity context) {
         this.context = context;
@@ -46,7 +48,7 @@ public class BLEBeaconWrapper<T> {
 
     public void getBeaconData(long timeInterval,
                               final BeaconListener tBeaconListener) {
-        new Thread(()-> beaconOnlyWrapper(BeaconHelper.getBeaconHelper(this.context),
+        new Thread(() -> beaconOnlyWrapper(BeaconHelper.getBeaconHelper(this.context),
                 timeInterval, tBeaconListener)).start();
     }
 
@@ -80,9 +82,7 @@ public class BLEBeaconWrapper<T> {
         parserListClass.parseData(t, responseString, new FilterListener<T>() {
             @Override
             public void onResponse(List<T> filteredData) {
-                context.runOnUiThread(()->{
-                    tBleBeaconListener.onParsableDataResult(filteredData);
-                });
+                context.runOnUiThread(() -> tBleBeaconListener.onParsableDataResult(filteredData));
                 beaconWrapperOperation(beaconHelper, filteredData, timeInterval, tBleBeaconListener);
             }
 
@@ -99,37 +99,37 @@ public class BLEBeaconWrapper<T> {
                     leScanCallbacks.get(i).getLeScanCallback() != null) {
                 leScanCallbacks.get(i).getBluetoothAdapter().
                         stopLeScan(leScanCallbacks.get(i).getLeScanCallback());
-                Log.d("BLE-RESPONSE", "Deleted : " + leScanCallbacks.get(i).getListenerCode());
+                Log.d(LOG2, "Deleted : " + leScanCallbacks.get(i).getListenerCode());
             }
         }
 
     }
 
     public void stopBeaconUpdates(BleBeaconListener bleBeaconListener) {
-        Log.d("TTMMPP", "*Code : " + bleBeaconListener.hashCode());
+        Log.d(LOG1, "*Code : " + bleBeaconListener.hashCode());
         for (int i = 0; i < leScanCallbacks.size(); i++) {
-            Log.d("TTMMPP", "Code : " + leScanCallbacks.get(i).getListenerCode());
+            Log.d(LOG1, "Code : " + leScanCallbacks.get(i).getListenerCode());
             if (leScanCallbacks.get(i).getBluetoothAdapter() != null &&
                     leScanCallbacks.get(i).getLeScanCallback() != null &&
                     bleBeaconListener.hashCode() == leScanCallbacks.get(i).getListenerCode()) {
                 leScanCallbacks.get(i).getBluetoothAdapter().
                         stopLeScan(leScanCallbacks.get(i).getLeScanCallback());
-                Log.d("BLE-RESPONSE", "Deleted : " + leScanCallbacks.get(i).getListenerCode());
+                Log.d(LOG2, "Deleted : " + leScanCallbacks.get(i).getListenerCode());
                 break;
             }
         }
     }
 
     public void stopBeaconUpdates(BeaconListener beaconListener) {
-        Log.d("TTMMPP", "*Code : " + beaconListener.hashCode());
+        Log.d(LOG1, "*Code : " + beaconListener.hashCode());
         for (int i = 0; i < leScanCallbacks.size(); i++) {
-            Log.d("TTMMPP", "Code : " + leScanCallbacks.get(i).getListenerCode());
+            Log.d(LOG1, "Code : " + leScanCallbacks.get(i).getListenerCode());
             if (leScanCallbacks.get(i).getBluetoothAdapter() != null &&
                     leScanCallbacks.get(i).getLeScanCallback() != null &&
                     beaconListener.hashCode() == leScanCallbacks.get(i).getListenerCode()) {
                 leScanCallbacks.get(i).getBluetoothAdapter().
                         stopLeScan(leScanCallbacks.get(i).getLeScanCallback());
-                Log.d("BLE-RESPONSE", "[Deleted] : " + leScanCallbacks.get(i).getListenerCode());
+                Log.d(LOG2, "[Deleted] : " + leScanCallbacks.get(i).getListenerCode());
                 break;
             }
         }

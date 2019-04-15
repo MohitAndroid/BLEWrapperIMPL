@@ -1,9 +1,8 @@
 package org.beaconwrapper.network;
 
 
-import android.bluetooth.le.BluetoothLeScanner;
+import android.util.Log;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ import okhttp3.Response;
 public class NetworkManager {
 
     public static void getRequest(String baseUrl, Map<String, String> headerData,
-                           RequestCallBackListener requestCallBackListener) {
+                                  RequestCallBackListener requestCallBackListener) {
         try {
             OkHttpClient client = new OkHttpClient();
             OkHttpClient eagerClient = client.newBuilder()
@@ -42,7 +41,6 @@ public class NetworkManager {
             eagerClient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    //call.cancel();
                     requestCallBackListener.onError(e.getMessage());
                 }
 
@@ -62,7 +60,7 @@ public class NetworkManager {
                             RequestCallBackListener requestCallBackListener) {
 
         try {
-            MediaType MEDIA_TYPE = MediaType.parse("application/json");
+            MediaType mediaType = MediaType.parse("application/json");
             OkHttpClient client = new OkHttpClient();
             OkHttpClient eagerClient = client.newBuilder()
                     .readTimeout(30, TimeUnit.SECONDS)
@@ -72,15 +70,8 @@ public class NetworkManager {
 
             Request.Builder builder = new Request.Builder();
             builder.url(baseUrl);
-            JSONObject postdata = new JSONObject();
-            for (Map.Entry<String, String> entry : bodyData.entrySet()) {
-                try {
-                    postdata.put(entry.getKey(), entry.getValue());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            RequestBody body = RequestBody.create(MEDIA_TYPE, postdata.toString());
+
+            RequestBody body = RequestBody.create(mediaType, getPostData(bodyData).toString());
             builder.post(body);
 
 
@@ -94,7 +85,6 @@ public class NetworkManager {
             eagerClient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    //call.cancel();
                     requestCallBackListener.onError(e.getMessage());
                 }
 
@@ -107,5 +97,17 @@ public class NetworkManager {
             requestCallBackListener.onError(e.getMessage());
         }
 
+    }
+
+    private JSONObject getPostData(Map<String, String> bodyData) {
+        JSONObject postData = new JSONObject();
+        try {
+            for (Map.Entry<String, String> entry : bodyData.entrySet()) {
+                postData.put(entry.getKey(), entry.getValue());
+            }
+        } catch (Exception e) {
+            Log.e(NetworkManager.class.getName(), e.getMessage(), e);
+        }
+        return postData;
     }
 }
