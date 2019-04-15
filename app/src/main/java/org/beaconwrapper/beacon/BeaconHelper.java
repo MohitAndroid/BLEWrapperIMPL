@@ -86,13 +86,14 @@ public class BeaconHelper<T> {
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    if (beaconResultEntities != null
-                            && !beaconResultEntities.isEmpty() &&
-                            isDifferent(oldKeys, newKeys)) {
-                        setOldKeys();
-                        BeaconHelper.this.beaconResultListener.onResult(beaconResultEntities);
-                    }
-
+                    context.runOnUiThread(() -> {
+                        if (beaconResultEntities != null
+                                && !beaconResultEntities.isEmpty() &&
+                                isDifferent(oldKeys, newKeys)) {
+                            setOldKeys();
+                            BeaconHelper.this.beaconResultListener.onResult(beaconResultEntities);
+                        }
+                    });
                 }
             }, 0, timeInterval);
         } catch (BeaconKeySerializeException e) {
@@ -172,19 +173,14 @@ public class BeaconHelper<T> {
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
 
-                    context.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            IBeacon iBeacon = IBeacon.fromScanData(scanRecord, rssi, device);
-                            if (iBeacon != null) {
-                                if (isOnlyBeaconStuff) {
-                                    getOnlyBeaconData(iBeacon);
-                                } else {
-                                    getBeaconFilteredData(iBeacon);
-                                }
-                            }
+                    IBeacon iBeacon = IBeacon.fromScanData(scanRecord, rssi, device);
+                    if (iBeacon != null) {
+                        if (isOnlyBeaconStuff) {
+                            getOnlyBeaconData(iBeacon);
+                        } else {
+                            getBeaconFilteredData(iBeacon);
                         }
-                    });
+                    }
 
                 }
             };

@@ -111,16 +111,6 @@ public class MainActivity extends AppCompatActivity  {
         bleBeaconWrapper.getBeaconData("http://api.plos.org/search?q=title:DNA",
                 DNAEntity.class, headerMap1, 3000, bleDnaListener);
 
-//        bleBeaconWrapper.getBeaconData(1000,beaconListener );
-
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                bleBeaconWrapper.stopBeaconUpdates(beaconListener);
-//            }
-//        }, 20000);
-
-
 
     }
 

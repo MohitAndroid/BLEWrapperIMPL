@@ -32,21 +32,22 @@ public class BLEBeaconWrapper<T> {
 
     public void getBeaconData(String url, Class<T> t, Map<String, String> headerData,
                               long timeInterval, final BleBeaconListener<T> tBleBeaconListener) {
-        networkOperation(ParserListClass.getParserListClass(),
-                BeaconHelper.getBeaconHelper(this.context),
-                url, t, headerData, timeInterval, tBleBeaconListener);
+        new Thread(() -> networkOperation(ParserListClass.getParserListClass(),
+                BeaconHelper.getBeaconHelper(context),
+                url, t, headerData, timeInterval, tBleBeaconListener)).start();
+
     }
 
     public void getBeaconData(List<T> list, long timeInterval,
                               final BleBeaconListener<T> tBleBeaconListener) {
-        beaconWrapperOperation(BeaconHelper.getBeaconHelper(this.context),
-                list, timeInterval, tBleBeaconListener);
+        new Thread(() -> beaconWrapperOperation(BeaconHelper.getBeaconHelper(this.context),
+                list, timeInterval, tBleBeaconListener)).start();
     }
 
     public void getBeaconData(long timeInterval,
                               final BeaconListener tBeaconListener) {
-        beaconOnlyWrapper(BeaconHelper.getBeaconHelper(this.context),
-                timeInterval, tBeaconListener);
+        new Thread(()-> beaconOnlyWrapper(BeaconHelper.getBeaconHelper(this.context),
+                timeInterval, tBeaconListener)).start();
     }
 
     private void networkOperation(ParserListClass parserListClass, BeaconHelper beaconHelper,
@@ -79,7 +80,9 @@ public class BLEBeaconWrapper<T> {
         parserListClass.parseData(t, responseString, new FilterListener<T>() {
             @Override
             public void onResponse(List<T> filteredData) {
-                tBleBeaconListener.onParsableDataResult(filteredData);
+                context.runOnUiThread(()->{
+                    tBleBeaconListener.onParsableDataResult(filteredData);
+                });
                 beaconWrapperOperation(beaconHelper, filteredData, timeInterval, tBleBeaconListener);
             }
 
@@ -155,7 +158,7 @@ public class BLEBeaconWrapper<T> {
                                    final BeaconListener tBeaconListener) {
         BleAdapterEntity bleAdapterEntity = new BleAdapterEntity(tBeaconListener.hashCode());
         leScanCallbacks.add(bleAdapterEntity);
-        beaconHelper.startBeaconUpdates(timeInterval, bleAdapterEntity,new BeaconListener() {
+        beaconHelper.startBeaconUpdates(timeInterval, bleAdapterEntity, new BeaconListener() {
             @Override
             public void onResult(List<IBeacon> beaconResultEntities) {
                 tBeaconListener.onResult(beaconResultEntities);
