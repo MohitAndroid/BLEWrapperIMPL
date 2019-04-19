@@ -20,6 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/**
+ * This class convert json into list of class objects of type T provided in the Type parameter
+ *
+ * @param <T> the type parameter provides Type of which object to be converted while parsing
+ */
 public class ParserListClass<T> {
     private List<DataInfoEntity> dataTypeEntities = new ArrayList<>();
     private Class<T> t;
@@ -29,6 +34,8 @@ public class ParserListClass<T> {
     private int count = 0;
     private String jsonString;
     private FilterListener<T> filterListener;
+    private List<T> filterData = new ArrayList<>();
+    private Gson gson;
 
     private ParserListClass() {
         rootFields = new ArrayList<>();
@@ -36,6 +43,11 @@ public class ParserListClass<T> {
         gson = new Gson();
     }
 
+    /**
+     * Gets parser list class instance.
+     *
+     * @return the parser list class instance
+     */
     public static ParserListClass getParserListClass() {
         return new ParserListClass();
     }
@@ -76,6 +88,14 @@ public class ParserListClass<T> {
         }
     }
 
+    /**
+     * Parse json string into type T object, make it as list for same and provide actual
+     * result to filter listener to publish.
+     *
+     * @param t              represent type of object to be parsed
+     * @param jsonString     the json string
+     * @param filterListener the filter listener provides callbacks
+     */
     public void parseData(Class<T> t, String jsonString, FilterListener<T> filterListener) {
         try {
             this.t = t;
@@ -101,7 +121,6 @@ public class ParserListClass<T> {
         }
 
     }
-
 
     private Map<String, Object> jsonToMap(JSONObject json) throws JSONException {
         Map<String, Object> retMap = new HashMap();
@@ -156,9 +175,6 @@ public class ParserListClass<T> {
         }
         return list;
     }
-
-
-    private List<T> filterData = new ArrayList<>();
 
     private void filterData() throws ParseFilterException {
         try {
@@ -221,8 +237,6 @@ public class ParserListClass<T> {
     private boolean isStringType() {
         return t.equals(String.class);
     }
-
-    private Gson gson;
 
     private T checkEntity(String response) {
         try {

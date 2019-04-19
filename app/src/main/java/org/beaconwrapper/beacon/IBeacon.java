@@ -23,7 +23,6 @@
  */
 package org.beaconwrapper.beacon;
 
-
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothDevice;
 import android.util.Log;
@@ -53,8 +52,6 @@ import java.util.Date;
  * distance measurement (the accuracy field) and group it into a more reliable buckets of
  * distance (the proximity field.)
  *
- * @author David G. Young
- * @see Region#matchesIBeacon(IBeacon iBeacon)
  */
 public class IBeacon {
     /**
@@ -74,7 +71,8 @@ public class IBeacon {
      */
     public static final int PROXIMITY_UNKNOWN = 0;
 
-    private static final char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    private static final char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a',
+            'b', 'c', 'd', 'e', 'f'};
 
     /**
      * A 16 byte UUID that typically represents the company owning a number of iBeacons
@@ -90,7 +88,8 @@ public class IBeacon {
      */
     protected int minor;
     /**
-     * An integer with four possible values representing a general idea of how far the iBeacon is away
+     * An integer with four possible values representing a general idea of how far the iBeacon
+     * is away
      *
      * @see #PROXIMITY_IMMEDIATE
      * @see #PROXIMITY_NEAR
@@ -99,9 +98,10 @@ public class IBeacon {
      */
     protected Integer proximity;
     /**
-     * A double that is an estimate of how far the iBeacon is away in meters.  This name is confusing, but is copied from
-     * the iOS7 SDK terminology.   Note that this number fluctuates quite a bit with RSSI, so despite the name, it is not
-     * super accurate.   It is recommended to instead use the proximity field, or your own bucketization of this value.
+     * A double that is an estimate of how far the iBeacon is away in meters. This name is
+     * confusing, but is copied from the iOS7 SDK terminology. Note that this number fluctuates
+     * quite a bit with RSSI, so despite the name, it is not super accurate. It is recommended
+     * to instead use the proximity field, or your own bucketization of this value.
      */
     protected Double accuracy;
     /**
@@ -124,8 +124,6 @@ public class IBeacon {
      * If multiple RSSI samples were available, this is the running average
      */
     protected Double runningAverageRssi = null;
-
-
     protected String bleDataPayload = "";
     protected String timezoneString = "";
 
@@ -235,7 +233,8 @@ public class IBeacon {
     }
 
     /**
-     * Two detected iBeacons are considered equal if they share the same three identifiers, regardless of their distance or RSSI.
+     * Two detected iBeacons are considered equal if they share the same three identifiers,
+     * regardless of their distance or RSSI.
      */
     @Override
     public boolean equals(Object that) {
@@ -243,7 +242,8 @@ public class IBeacon {
             return false;
         }
         IBeacon thatIBeacon = (IBeacon) that;
-        return (thatIBeacon.getMajor() == this.getMajor() && thatIBeacon.getMinor() == this.getMinor() && thatIBeacon.getProximityUuid().equals(this.getProximityUuid()));
+        return (thatIBeacon.getMajor() == this.getMajor() && thatIBeacon.getMinor() ==
+                this.getMinor() && thatIBeacon.getProximityUuid().equals(this.getProximityUuid()));
     }
 
     /**
@@ -298,8 +298,10 @@ public class IBeacon {
 
         IBeacon iBeacon = new IBeacon();
 
-        iBeacon.major = (scanData[startByte + 20] & 0xff) * 0x100 + (scanData[startByte + 21] & 0xff);
-        iBeacon.minor = (scanData[startByte + 22] & 0xff) * 0x100 + (scanData[startByte + 23] & 0xff);
+        iBeacon.major = (scanData[startByte + 20] & 0xff) * 0x100 + (scanData[startByte + 21] &
+                0xff);
+        iBeacon.minor = (scanData[startByte + 22] & 0xff) * 0x100 + (scanData[startByte + 23] &
+                0xff);
         iBeacon.txPower = (int) scanData[startByte + 24]; // this one is signed
         iBeacon.rssi = rssi;
         iBeacon.bleDataPayload = getPayloadData(scanData);
@@ -384,7 +386,6 @@ public class IBeacon {
         return text.trim();
     }
 
-
     protected IBeacon(IBeacon otherIBeacon) {
         this.major = otherIBeacon.major;
         this.minor = otherIBeacon.minor;
@@ -434,7 +435,8 @@ public class IBeacon {
         if (accuracy < 0.5) {
             return IBeacon.PROXIMITY_IMMEDIATE;
         }
-        // forums say 3.0 is the near/far threshold, but it looks to be based on experience that this is 4.0
+        // forums say 3.0 is the near/far threshold, but it looks to be based on experience that
+        // this is 4.0
         if (accuracy <= 4.0) {
             return IBeacon.PROXIMITY_NEAR;
         }

@@ -15,6 +15,22 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * <p>This class is responsible for start beacon updates along with overloaded parameters.</p>
+ * <p>Two ways for start beacon updates.</p>
+ * <p>
+ * <pre>
+ *     1st way :
+ *              Pass List of model classes in which you want to filter data according to beacon
+ *              along with time interval and callbacks
+ *     2nd way :
+ *              Get only beacon list along with time interval and callbacks
+ *     </pre>
+ * </p>
+ *
+ * @param <T> the type parameter represent Generic Model class which is actually pass in
+ *            startBeaconUpdate method of this class.
+ */
 public class BeaconHelper<T> {
     private BluetoothAdapter mBluetoothAdapter;
     private Activity context;
@@ -32,8 +48,14 @@ public class BeaconHelper<T> {
     private boolean isOnlyBeaconStuff;
     private List<IBeacon> iBeacons;
 
-    public static BeaconHelper getBeaconHelper(Activity mContext) {
-        return new BeaconHelper(mContext);
+    /**
+     * Provide BeaconHelper instance.
+     *
+     * @param activityContext defines context
+     * @return the BeaconHelper instance
+     */
+    public static BeaconHelper getBeaconHelper(Activity activityContext) {
+        return new BeaconHelper(activityContext);
     }
 
     private BeaconHelper(Activity context) {
@@ -51,7 +73,21 @@ public class BeaconHelper<T> {
         isOnlyBeaconStuff = false;
     }
 
-    public void startBeaconUpdates(List<T> data, long timeInterval, BleAdapterEntity bleAdapterEntity,
+    /**
+     * Start beacon updates and provide filter list of data which is passed as parameter in
+     * this method via callbacks along with specified time frequency.
+     *
+     * @param data                 the list of data along with generic model class which is
+     *                             to be filtered based on beacon frequency
+     * @param timeInterval         the time interval represent in how much time beacon updates
+     *                             will broadcast updates
+     * @param bleAdapterEntity     keep tracking records for stop beacon updates later on time
+     * @param beaconResultListener represent callback for beacon update at specified time if there
+     *                             is any difference available otherwise no need to publish just
+     *                             keep previous data remains as it is.
+     */
+    public void startBeaconUpdates(List<T> data, long timeInterval,
+                                   BleAdapterEntity bleAdapterEntity,
                                    BeaconResultListener beaconResultListener) {
         this.isOnlyBeaconStuff = false;
         this.beaconResultListener = beaconResultListener;
@@ -86,6 +122,14 @@ public class BeaconHelper<T> {
         }
     }
 
+    /**
+     * Start beacon updates and provides only beacons with specified time frequency.
+     *
+     * @param timeInterval     the time interval represent in how much time beacon updates
+     *                         will broadcast updates
+     * @param bleAdapterEntity keep tracking records for stop beacon updates later on time
+     * @param beaconListener   represent callback for beacon update
+     */
     public void startBeaconUpdates(long timeInterval, BleAdapterEntity bleAdapterEntity,
                                    BeaconListener beaconListener) {
         this.isOnlyBeaconStuff = true;
@@ -130,7 +174,8 @@ public class BeaconHelper<T> {
                         getBeaconFieldTypeEntity(data.get(i));
                 for (int j = 0; j < beaconAnnotationDetails.getFieldValue().size(); j++) {
                     if (dataMap.containsKey(beaconAnnotationDetails.getFieldValue().get(j))) {
-                        dataMap.get(beaconAnnotationDetails.getFieldValue().get(j)).add(data.get(i));
+                        dataMap.get(beaconAnnotationDetails.getFieldValue().get(j)).
+                                add(data.get(i));
                     } else {
                         List<T> entities = new ArrayList<>();
                         entities.add(data.get(i));

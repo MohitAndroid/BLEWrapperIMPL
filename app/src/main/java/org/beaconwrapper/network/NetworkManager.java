@@ -1,6 +1,5 @@
 package org.beaconwrapper.network;
 
-
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -18,8 +17,18 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 
+/**
+ * This class is responsible for fire request to server and providing proper response for same.
+ */
 public class NetworkManager {
 
+    /**
+     * Handle get request.
+     *
+     * @param baseUrl                 the base url
+     * @param headerData              the header data
+     * @param requestCallBackListener the request call back listener
+     */
     public static void getRequest(String baseUrl, Map<String, String> headerData,
                                   RequestCallBackListener requestCallBackListener) {
         try {
@@ -55,6 +64,14 @@ public class NetworkManager {
 
     }
 
+    /**
+     * Handle Post request.
+     *
+     * @param baseUrl                 the base url
+     * @param headerData              the header data
+     * @param bodyData                the body data
+     * @param requestCallBackListener the request call back listener
+     */
     public void postRequest(String baseUrl, Map<String, String> headerData,
                             Map<String, String> bodyData,
                             RequestCallBackListener requestCallBackListener) {
