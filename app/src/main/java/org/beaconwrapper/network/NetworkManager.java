@@ -16,7 +16,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-
 /**
  * This class is responsible for fire request to server and providing proper response for same.
  */

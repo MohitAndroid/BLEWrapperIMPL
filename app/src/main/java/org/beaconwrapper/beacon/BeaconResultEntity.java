@@ -1,6 +1,5 @@
 package org.beaconwrapper.beacon;
 
-
 import java.util.List;
 
 /**

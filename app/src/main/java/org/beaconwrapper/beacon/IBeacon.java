@@ -31,7 +31,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
 /**
  * The <code>IBeacon</code> class represents a single hardware iBeacon detected by
  * an Android device.
