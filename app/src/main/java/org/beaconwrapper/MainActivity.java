@@ -3,6 +3,7 @@ package org.beaconwrapper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.beaconwrapper.beacon.BeaconListener;
 import org.beaconwrapper.beacon.BeaconResultEntity;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < list.size(); i++) {
                 Log.d("BLE-RESPONSE", "[Coupon] Inside : " + list.get(i).getBeaconDetail().getBluetoothAddress()
                         + " | Accuracy : " + list.get(i).getBeaconDetail().getAccuracy());
+//                Toast.makeText(MainActivity.this,""+list.get(i).getBeaconDetail().getAccuracy(),Toast.LENGTH_LONG).show();
             }
 
         }
